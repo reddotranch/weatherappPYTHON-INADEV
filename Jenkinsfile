@@ -3,7 +3,7 @@ pipeline {
     parameters {
       choice(name: 'aws_account',choices: ['654654193818', '4568366404742', '922266408974','576900672829'], description: 'aws account hosting image registry')
       choice(name: 'Environment', choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Target environment for deployment')
-      string(name: 'ecr_tag', defaultValue: '1.0.0', description: 'Assign the ECR tag version for the build')
+      string(name: 'ecr_tag', defaultValue: '1.5.0', description: 'Assign the ECR tag version for the build')
     }
 /*
     tools {
@@ -66,7 +66,7 @@ pipeline {
       steps {
         echo 'Success'
         mail bcc: 'gofullblastonline@gmail.com', body: '''Build is Over. Check the application using the URL below:
-        https://app.kubeigu.plainandplane.com/
+        https://weatherapp.kubeigu.plainandplane.com/
         Let me know if the changes look okay.
         Thanks,
         TDW System Technologies,
