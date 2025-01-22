@@ -9,13 +9,13 @@ pipeline {
     tools {
       maven "Maven-3.9.8"
     }
+*/
     stages {
     stage('1. Git Checkout') {
       steps {
         git branch: 'master', credentialsId: 'jenkins2025weather', url: 'https://github.com/mbwork1/weatherappPYTHON-INADEV.git'
       }
     }
-*/
 
     stage('2. SonarQube Analysis') {
           environment {
@@ -75,3 +75,4 @@ pipeline {
       }
     }
   }
+}
