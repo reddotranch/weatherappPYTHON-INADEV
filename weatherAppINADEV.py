@@ -77,4 +77,4 @@ def weather():
     return render_template_string(HTML_TEMPLATE, weather_data=weather_data, city=city)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=8081)
