@@ -1,0 +1,6 @@
+resources:
+- metric-server.yaml
+- grafana-ingress.yaml
+- storage-class.yaml
+- fluentd-config.yaml
+- elastic-stack.yaml

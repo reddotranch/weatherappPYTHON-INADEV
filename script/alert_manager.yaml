@@ -1,0 +1,92 @@
+
+ #1.Identify secret object hosting alertmanager config file
+
+ kubectl get secret alertmanager-kube-prometheus-stack-alertmanager 
+
+ #2. Extracting yaml file to decode data
+ k get secret alertmanager-kube-prometheus-stack-alertmanager -o yaml
+
+ #3. Extract and decode 
+ echo "alertmanager.yaml 'data content'" | base64 -d 
+
+ #4. Output of base64 decoded data
+global:
+  resolve_timeout: 5m
+inhibit_rules:
+- equal:
+  - namespace
+  - alertname
+  source_matchers:
+  - severity = critical
+  target_matchers:
+  - severity =~ warning|info
+- equal:
+  - namespace
+  - alertname
+  source_matchers:
+  - severity = warning
+  target_matchers:
+  - severity = info
+- equal:
+  - namespace
+  source_matchers:
+  - alertname = InfoInhibitor
+  target_matchers:
+  - severity = info
+- target_matchers:
+  - alertname = InfoInhibitor
+receivers:
+- name: "null"
+route:
+  group_by:
+  - namespace
+  group_interval: 5m
+  group_wait: 30s
+  receiver: "null"
+  repeat_interval: 12h
+  routes:
+  - matchers:
+    - alertname = "Watchdog"
+    receiver: "null"
+templates:
+- /etc/alertmanager/config
+
+
+#5. Delete alertmanager secret 
+ kubectl delete secret alertmanager-kube-prometheus-stack-alertmanager
+
+
+#6. Put content below in a file alertmanager.yaml 
+cat <<EOF > alertmanager.yaml
+global:
+  slack_api_url: 'https://hooks.slack.com/services/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'
+route:
+  group_by: ['alertname']
+  group_wait: 5s
+  group_interval: 1m
+  repeat_interval: 10m
+  receiver: 'slack'
+receivers:
+- name: 'slack'
+  slack_configs:
+  - channel: '#alerts'
+    icon_emoji: ':bell:'
+    send_resolved: true
+    text: "<!channel> \nsummary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}\nmessage: {{ .CommonAnnotations.message }}"
+EOF
+
+#7. Recreate the alertmanager secret using the commands below
+
+kubectl create secret generic alertmanager-kube-prometheus-stack-alertmanager --from-file=alertmanager.yaml 
+
+
+
+
+#Admin password reset for grafana
+
+
+/usr/share/grafana/bin/grafana-cli admin reset-admin-password 'Sch00l@12'
+
+
+
+

@@ -8,4 +8,4 @@ RUN pip install requests Flask
 
 CMD [ "python", "./weatherAppINADEV.py" ]
 
-EXPOSE 80
+EXPOSE 8081

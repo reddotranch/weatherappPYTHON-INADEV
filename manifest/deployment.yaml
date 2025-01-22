@@ -1,0 +1,22 @@
+# Complete Manifest Where in single yml we defined Deployment & Service for SpringApp & PVC(with default  StorageClass),ReplicaSet & Service For Mongo.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: directory
+  name: weatherapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weatherapp
+  template:
+    metadata:
+      name: weatherapp
+      labels:
+        app: weatherapp
+    spec:
+      containers:
+      - name: weatherapp-container
+        image: 654654193818.dkr.ecr.us-east-2.amazonaws.com/weatherapp:1.0.0
+        ports:
+        - containerPort: 8081
