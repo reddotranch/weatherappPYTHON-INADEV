@@ -9,7 +9,6 @@ pipeline {
     tools {
       maven "Maven-3.9.8"
     }
-*/
     stages {
     stage('1. Git Checkout') {
       steps {
@@ -34,6 +33,8 @@ pipeline {
                   }
               }
         }
+
+*/
     stage('3. Docker Image Build') {
       steps {
           sh "aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin ${aws_account}.dkr.ecr.us-east-2.amazonaws.com"
