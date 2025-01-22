@@ -15,6 +15,7 @@ pipeline {
         git branch: 'master', credentialsId: 'jenkins2025weather', url: 'https://github.com/mbwork1/weatherappPYTHON-INADEV.git'
       }
     }
+*/
 
     stage('2. SonarQube Analysis') {
           environment {
@@ -34,7 +35,6 @@ pipeline {
               }
         }
 
-*/
     stage('3. Docker Image Build') {
       steps {
           sh "aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin ${aws_account}.dkr.ecr.us-east-2.amazonaws.com"
