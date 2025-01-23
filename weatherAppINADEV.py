@@ -13,6 +13,7 @@ def get_weather(city):
     if json_data.get("cod") != 200:
         return None  # Return None if city not found
 
+    temp = int(((json_data['main']['temp'] - 273.15) * 9/5) + 32)
     min_temp = int(((json_data['main']['temp_min'] - 273.15) * 9/5) + 32)
     max_temp = int(((json_data['main']['temp_max'] - 273.15) * 9/5) + 32)
     pressure = json_data['main']['pressure']
@@ -22,6 +23,7 @@ def get_weather(city):
     sunset = time.strftime('%I:%M:%S', time.gmtime(json_data['sys']['sunset'] - 21600))
 
     return {
+        "temp": temp,
         "min_temp": min_temp,
         "max_temp": max_temp,
         "pressure": pressure,
@@ -48,6 +50,7 @@ HTML_TEMPLATE = """
     </form>
     {% if weather_data %}
         <h2>Weather in {{ city }}:</h2>
+        <p>Temperature: {{ weather_data.temp }} °F</p>
         <p>Min Temperature: {{ weather_data.min_temp }} °F</p>
         <p>Max Temperature: {{ weather_data.max_temp }} °F</p>
         <p>Pressure: {{ weather_data.pressure }} hPa</p>
