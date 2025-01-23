@@ -19,8 +19,8 @@ def get_weather(city):
     pressure = json_data['main']['pressure']
     humidity = json_data['main']['humidity']
     wind = json_data['wind']['speed']
-    sunrise = time.strftime('%I:%M:%S', time.gmtime(json_data['sys']['sunrise'] - 21600))
-    sunset = time.strftime('%I:%M:%S', time.gmtime(json_data['sys']['sunset'] - 21600))
+    sunset = time.strftime('%I:%M:%S %p', time.gmtime(json_data['sys']['sunset'] - 18000))
+    sunrise = time.strftime('%I:%M:%S %p', time.gmtime(json_data['sys']['sunrise'] - 18000))
 
     return {
         "temp": temp,
