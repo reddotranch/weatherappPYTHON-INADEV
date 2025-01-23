@@ -1,3 +1,8 @@
+def COLOR_MAP = [
+    'SUCCESS': 'good', 
+    'FAILURE': 'danger',
+]
+
 pipeline {
     agent { node { label "MAVEN-SONAR" } }   
     parameters {
@@ -65,14 +70,23 @@ pipeline {
     stage('6. Email Notification') {
       steps {
         echo 'Success'
-        mail bcc: 'gofullblastonline@gmail.com', body: '''Build is Over. Check the application using the URL below:
+        mail bcc: 'tdwaws2024@gmail.com', body: '''Build is Over. Check the application using the URL below:
         https://weatherapp.kubeigu.plainandplane.com/
         Let me know if the changes look okay.
         Thanks,
         TDW System Technologies,
         +1 (123) 123-4567''', 
-        subject: 'Application was Successfully Deployed!!', to: 'gofullblastonline@gmail.com'
+        subject: 'Application was Successfully Deployed!!', to: 'tdwaws2024@gmail.com'
       }
     }
   }
+    post {
+         always {
+            echo 'Slack Notifications.'
+            slackSend channel: '#all-weather-cicd',
+                color: COLOR_MAP[currentBuild.currentResult],
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URL}"
+        }
+    }
+  
 }
