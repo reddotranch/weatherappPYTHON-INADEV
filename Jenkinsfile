@@ -51,7 +51,7 @@ pipeline {
 
     stage('4. Application Deployment in EKS') {
       steps {
-        withKubeconfig(caCertificate: '', credentialsId: 'kubeconfig', serverUrl: '') {
+        withKubeConfig(caCertificate: '', credentialsId: 'kubeconfig', serverUrl: '') {
           sh "kubectl apply -f manifest"
         }
       }
@@ -59,7 +59,7 @@ pipeline {
 
     stage('5. Monitoring Solution Deployment in EKS') {
       steps {
-        withKubeconfig(caCertificate: '', credentialsId: 'kubeconfig', serverUrl: '') {
+        withKubeConfig(caCertificate: '', credentialsId: 'kubeconfig', serverUrl: '') {
           sh "kubectl apply -k monitoring"
           sh("""script/install_helm.sh""") 
           sh("""script/install_prometheus.sh""") 
