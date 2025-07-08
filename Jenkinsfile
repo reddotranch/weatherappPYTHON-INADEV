@@ -8,6 +8,7 @@ pipeline {
     parameters {
       choice(name: 'aws_account',choices: ['654654193818', '374965156099', '922266408974','576900672829'], description: 'aws account hosting image registry')
       choice(name: 'Environment', choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Target environment for deployment')
+      choice(name: 'Cluster', choices: ['betech-cluster', 'dev-cluster','uat-cluster'], description: 'Kubeconfig file content')
       string(name: 'ecr_tag', defaultValue: '1.5.2', description: 'Assign the ECR tag version for the build')
     }
 /*
@@ -45,25 +46,34 @@ pipeline {
           sh "aws ecr get-login-password --region us-west-2 | sudo docker login --username AWS --password-stdin ${aws_account}.dkr.ecr.us-west-2.amazonaws.com"
           sh "sudo docker build -t weatherapp ."
           sh "sudo docker tag weatherapp:latest ${aws_account}.dkr.ecr.us-west-2.amazonaws.com/weatherapp:${params.ecr_tag}"
-          sh "sudo docker push ${aws_account}.dkr.ecr.us-west-2.amazonaws.com/weatherapp:${params.ecr_tag}"
+          sh """sudo docker push ${aws_account}.dkr.ecr.us-west-2.amazonaws.com/weatherapp:${params.ecr_tag}"""
       }
     }
 
-    stage('4. Application Deployment in EKS') {
+    stage('3.1. Docker Image Scan') {
       steps {
-        withKubeConfig(caCertificate: '', credentialsId: 'kubeconfig', serverUrl: '') {
+          sh "aws ecr start-image-scan --repository-name weatherapp --image-id imageTag=${params.ecr_tag} --region us-west-2"
+          sh "aws ecr describe-image-scan-findings --repository-name weatherapp --image-id imageTag=${params.ecr_tag} --region us-west-2"
+      }
+    }
+
+    stage('4. Update Kubeconfig') {
+      steps {
+        sh "aws eks --region us-west-2 update-kubeconfig --name ${params.Cluster} && export KUBE_CONFIG_PATH=~/.kube/config"
+      }
+    }
+
+    stage('4.1. Application Deployment in EKS') {
+      steps {
           sh '/home/ubuntu/bin/kubectl apply -f manifest'
-        }
       }
     }
 
     stage('5. Monitoring Solution Deployment in EKS') {
       steps {
-        withKubeConfig(caCertificate: '', credentialsId: 'kubeconfig', serverUrl: '') {
           sh '/home/ubuntu/bin/kubectl apply -k monitoring'
           sh("""script/install_helm.sh""") 
           sh("""script/install_prometheus.sh""") 
-        }
       }
     }
 
