@@ -6,7 +6,7 @@ def COLOR_MAP = [
 pipeline {
     agent { node { label "MAVEN-SONAR" } }   
     parameters {
-      choice(name: 'aws_account',choices: ['654654193818', '4568366404742', '922266408974','576900672829'], description: 'aws account hosting image registry')
+      choice(name: 'aws_account',choices: ['654654193818', '374965156099', '922266408974','576900672829'], description: 'aws account hosting image registry')
       choice(name: 'Environment', choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Target environment for deployment')
       string(name: 'ecr_tag', defaultValue: '1.5.2', description: 'Assign the ECR tag version for the build')
     }
@@ -18,7 +18,7 @@ pipeline {
     stages {
     stage('1. Git Checkout') {
       steps {
-        git branch: 'master', credentialsId: 'jenkins2025weather', url: 'https://github.com/mbwork1/weatherappPYTHON-INADEV.git'
+        git branch: 'master', credentialsId: 'jenkins2025weather', url: 'https://github.com/reddotranch/weatherappPYTHON-INADEV.git'
       }
     }
 
@@ -32,7 +32,7 @@ pipeline {
                       ${scannerHome}/bin/sonar-scanner  \
                       -Dsonar.projectKey=weather-app \
                       -Dsonar.projectName='weather-app' \
-                      -Dsonar.host.url=https://sonarqube1.kubeigu.plainandplane.com \
+                      -Dsonar.host.url=https://sonarqube1.betechsol.com \
                       -Dsonar.token=${SONAR_TOKEN} \
                       -Dsonar.sources=.\
                      """
@@ -42,10 +42,10 @@ pipeline {
 
     stage('3. Docker Image Build') {
       steps {
-          sh "aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin ${aws_account}.dkr.ecr.us-east-2.amazonaws.com"
+          sh "aws ecr get-login-password --region us-west-2 | sudo docker login --username AWS --password-stdin ${aws_account}.dkr.ecr.us-west-2.amazonaws.com"
           sh "sudo docker build -t weatherapp ."
-          sh "sudo docker tag weatherapp:latest ${aws_account}.dkr.ecr.us-east-2.amazonaws.com/weatherapp:${params.ecr_tag}"
-          sh "sudo docker push ${aws_account}.dkr.ecr.us-east-2.amazonaws.com/weatherapp:${params.ecr_tag}"
+          sh "sudo docker tag weatherapp:latest ${aws_account}.dkr.ecr.us-west-2.amazonaws.com/weatherapp:${params.ecr_tag}"
+          sh "sudo docker push ${aws_account}.dkr.ecr.us-west-2.amazonaws.com/weatherapp:${params.ecr_tag}"
       }
     }
 
@@ -70,8 +70,8 @@ pipeline {
     stage('6. Email Notification') {
       steps {
         echo 'Success'
-        mail bcc: 'tdwaws2024@gmail.com', body: '''Build is Over. Check the application using the URL below:
-        https://weatherapp.kubeigu.plainandplane.com/
+        mail bcc: 'betechincorporated@gmail.com', body: '''Build is Over. Check the application using the URL below:
+        https://weatherapp.betechsol.com/
         Let me know if the changes look okay.
         Thanks,
         TDW System Technologies,
