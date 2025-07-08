@@ -6,9 +6,9 @@ def COLOR_MAP = [
 pipeline {
     agent { node { label "MAVEN-SONAR" } }   
     parameters {
-      choice(name: 'aws_account',defaultValue: '374965156099', choices: ['654654193818', '374965156099', '922266408974','576900672829'], description: 'aws account hosting image registry')
-      choice(name: 'Environment', defaultValue: 'Dev', choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Target environment for deployment')
-      choice(name: 'Cluster', defaultValue: 'betech-cluster', choices: ['betech-cluster', 'dev-cluster','uat-cluster'], description: 'Kubeconfig file update for the EKS cluster')
+      choice(name: 'aws_account', choices: ['374965156099', '654654193818', '922266408974','576900672829'], description: 'aws account hosting image registry')
+      choice(name: 'Environment', choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Target environment for deployment')
+      choice(name: 'Cluster', choices: ['betech-cluster', 'dev-cluster','uat-cluster'], description: 'Kubeconfig file update for the EKS cluster')
       string(name: 'ecr_tag', defaultValue: '1.5.2', description: 'Assign the ECR tag version for the build')
     }
 /*
