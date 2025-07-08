@@ -1,11 +1,11 @@
-apiVersion: networking.k8s.io/v1
+rapiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: weatherapp-ingress
   namespace: directory
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:654654193818:certificate/1d7ba561-c6c3-4c7d-9ec9-421c73154b27
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:374965156099:certificate/d8a6af47-551b-493e-a375-6134a905fcf2
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-port: "8081" # Updated to match the service port
