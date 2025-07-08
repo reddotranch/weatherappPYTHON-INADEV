@@ -18,7 +18,7 @@ pipeline {
     stages {
     stage('1. Git Checkout') {
       steps {
-        git branch: 'master', credentialsId: 'jenkins2025weather', url: 'https://github.com/reddotranch/weatherappPYTHON-INADEV.git'
+        git branch: 'master', credentialsId: 'betech-pipeline', url: 'https://github.com/reddotranch/weatherappPYTHON-INADEV.git'
       }
     }
 
