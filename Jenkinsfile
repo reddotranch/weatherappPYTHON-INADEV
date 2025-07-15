@@ -6,6 +6,7 @@ def COLOR_MAP = [
 pipeline {
     agent { node { label "MAVEN-SONAR" } }   
     parameters {
+      choice(name: 'Deployment_Type', choices: ['apply', 'destroy'], description: 'Choose deployment or destroy operation')
       choice(name: 'aws_account', choices: ['374965156099', '654654193818', '922266408974','576900672829'], description: 'aws account hosting image registry')
       choice(name: 'Environment', choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Target environment for deployment')
       choice(name: 'Cluster', choices: ['betech-cluster', 'dev-cluster','uat-cluster'], description: 'Kubeconfig file update for the EKS cluster')
@@ -18,12 +19,18 @@ pipeline {
 */
     stages {
     stage('1. Git Checkout') {
+      when { 
+        expression { params.Deployment_Type == 'apply' }
+      }
       steps {
         git branch: 'master', credentialsId: 'betech-pipeline', url: 'https://github.com/reddotranch/weatherappPYTHON-INADEV.git'
       }
     }
 
     stage('2. SonarQube Analysis') {
+          when { 
+            expression { params.Deployment_Type == 'apply' }
+          }
           environment {
                 scannerHome = tool 'SonarQube-Scanner-6.2.1'
             }
@@ -42,6 +49,9 @@ pipeline {
         }
 
     stage('3. Docker Image Build') {
+      when { 
+        expression { params.Deployment_Type == 'apply' }
+      }
       steps {
           sh "aws ecr get-login-password --region us-west-2 | sudo docker login --username AWS --password-stdin ${aws_account}.dkr.ecr.us-west-2.amazonaws.com"
           sh "sudo docker build -t weatherapp ."
@@ -51,6 +61,9 @@ pipeline {
     }
 
     stage('3.1. Docker Image Scan') {
+      when { 
+        expression { params.Deployment_Type == 'apply' }
+      }
       steps {
           sh "aws ecr start-image-scan --repository-name weatherapp --image-id imageTag=${params.ecr_tag} --region us-west-2"
           sh "aws ecr describe-image-scan-findings --repository-name weatherapp --image-id imageTag=${params.ecr_tag} --region us-west-2"
@@ -64,12 +77,18 @@ pipeline {
     }
 
     stage('4.1. Application Deployment in EKS') {
+      when { 
+        expression { params.Deployment_Type == 'apply' }
+      }
       steps {
           sh '/home/ubuntu/bin/kubectl apply -f manifest'
       }
     }
 
     stage('5. Monitoring Solution Deployment in EKS') {
+      when { 
+        expression { params.Deployment_Type == 'apply' }
+      }
       steps {
           sh '/home/ubuntu/bin/kubectl apply -k monitoring'
           sh("""script/install_helm.sh""") 
@@ -77,16 +96,88 @@ pipeline {
       }
     }
 
+    stage('5.1. Application Destroy') {
+      when { 
+        expression { params.Deployment_Type == 'destroy' }
+      }
+      steps {
+        echo 'Destroying Weather App Deployment from EKS...'
+        
+        // Update kubeconfig for destroy operations
+        sh "aws eks --region us-west-2 update-kubeconfig --name ${params.Cluster} && export KUBE_CONFIG_PATH=~/.kube/config"
+        
+        // Remove application manifests
+        sh '''
+        echo "Removing weather app manifests..."
+        /home/ubuntu/bin/kubectl delete -f manifest --ignore-not-found=true || echo "Manifests already removed or not found"
+        '''
+        
+        // Remove monitoring solution
+        sh '''
+        echo "Removing monitoring solution..."
+        /home/ubuntu/bin/kubectl delete -k monitoring --ignore-not-found=true || echo "Monitoring solution already removed or not found"
+        '''
+        
+        // Clean up namespaces
+        sh '''
+        echo "Cleaning up weather app namespaces..."
+        /home/ubuntu/bin/kubectl delete namespace directory --ignore-not-found=true || echo "Directory namespace not found"
+        /home/ubuntu/bin/kubectl delete namespace gateway --ignore-not-found=true || echo "Gateway namespace not found"
+        /home/ubuntu/bin/kubectl delete namespace analytics --ignore-not-found=true || echo "Analytics namespace not found"
+        '''
+        
+        // Clean up any remaining ingresses
+        sh '''
+        echo "Cleaning up ingresses..."
+        /home/ubuntu/bin/kubectl delete ingress --all --all-namespaces --ignore-not-found=true || echo "No ingresses to clean up"
+        '''
+        
+        // Wait for resources to be cleaned up
+        sh '''
+        echo "Waiting for resources to be cleaned up..."
+        sleep 30
+        '''
+        
+        echo 'Weather App Destroy completed successfully'
+      }
+    }
+
     stage('6. Email Notification') {
       steps {
         echo 'Success'
-        mail bcc: 'betechincorporated@gmail.com', body: '''Build is Over. Check the application using the URL below:
+        script {
+          def emailBody = ''
+          def emailSubject = ''
+          
+          if (params.Deployment_Type == 'apply') {
+            emailBody = '''Build is Over. Check the application using the URL below:
         https://weatherapp.betechsol.com/
         Let me know if the changes look okay.
         Thanks,
         TDW System Technologies,
-        +1 (123) 123-4567''', 
-        subject: 'Application was Successfully Deployed!!', to: 'tdwaws2024@gmail.com'
+        +1 (123) 123-4567'''
+            emailSubject = 'Application was Successfully Deployed!!'
+          } else {
+            emailBody = '''Weather App Destroy is completed.
+        
+        The following resources have been removed:
+        - Application manifests
+        - Monitoring solution
+        - Associated namespaces
+        - Ingresses and Load Balancers
+        
+        Let me know if you need any assistance.
+        Thanks,
+        TDW System Technologies,
+        +1 (123) 123-4567'''
+            emailSubject = 'Application was Successfully Destroyed!!'
+          }
+          
+          mail bcc: 'betechincorporated@gmail.com', 
+               body: emailBody,
+               subject: emailSubject, 
+               to: 'tdwaws2024@gmail.com'
+        }
       }
     }
   }
