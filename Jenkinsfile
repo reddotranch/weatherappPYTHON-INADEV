@@ -4,7 +4,7 @@ def COLOR_MAP = [
 ]
 
 pipeline {
-    agent { node { label "MAVEN-SONAR" } }   
+    agent { node { label "maven-sonarqube-slave" } }   
     parameters {
       choice(name: 'Deployment_Type', choices: ['apply', 'destroy'], description: 'Choose deployment or destroy operation')
       choice(name: 'aws_account', choices: ['374965156099', '654654193818', '922266408974','576900672829'], description: 'aws account hosting image registry')

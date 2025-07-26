@@ -5,7 +5,7 @@ metadata:
   namespace: directory
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:374965156099:certificate/d8a6af47-551b-493e-a375-6134a905fcf2
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:374965156099:certificate/94685ce3-d71c-4caa-b998-a424f049cc8f
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-port: "8081" # Updated to match the service port
