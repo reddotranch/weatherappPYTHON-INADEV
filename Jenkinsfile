@@ -124,7 +124,7 @@ pipeline {
         expression { params.Deployment_Type == 'apply' }
       }
       steps {
-          sh '/home/ubuntu/bin/kubectl apply -f manifest'
+          sh 'kubectl apply -f manifest'
       }
     }
 
@@ -152,27 +152,27 @@ pipeline {
         // Remove application manifests
         sh '''
         echo "Removing weather app manifests..."
-        /home/ubuntu/bin/kubectl delete -f manifest --ignore-not-found=true || echo "Manifests already removed or not found"
+        kubectl delete -f manifest --ignore-not-found=true || echo "Manifests already removed or not found"
         '''
         
         // Remove monitoring solution
         sh '''
         echo "Removing monitoring solution..."
-        /home/ubuntu/bin/kubectl delete -k monitoring --ignore-not-found=true || echo "Monitoring solution already removed or not found"
+        kubectl delete -k monitoring --ignore-not-found=true || echo "Monitoring solution already removed or not found"
         '''
         
         // Clean up namespaces
         sh '''
         echo "Cleaning up weather app namespaces..."
-        /home/ubuntu/bin/kubectl delete namespace directory --ignore-not-found=true || echo "Directory namespace not found"
-        /home/ubuntu/bin/kubectl delete namespace gateway --ignore-not-found=true || echo "Gateway namespace not found"
-        /home/ubuntu/bin/kubectl delete namespace analytics --ignore-not-found=true || echo "Analytics namespace not found"
+        kubectl delete namespace directory --ignore-not-found=true || echo "Directory namespace not found"
+        kubectl delete namespace gateway --ignore-not-found=true || echo "Gateway namespace not found"
+        kubectl delete namespace analytics --ignore-not-found=true || echo "Analytics namespace not found"
         '''
         
         // Clean up any remaining ingresses
         sh '''
         echo "Cleaning up ingresses..."
-        /home/ubuntu/bin/kubectl delete ingress --all --all-namespaces --ignore-not-found=true || echo "No ingresses to clean up"
+        kubectl delete ingress --all --all-namespaces --ignore-not-found=true || echo "No ingresses to clean up"
         '''
         
         // Wait for resources to be cleaned up
