@@ -133,7 +133,7 @@ pipeline {
         expression { params.Deployment_Type == 'apply' }
       }
       steps {
-          sh '/home/ubuntu/bin/kubectl apply -k monitoring'
+          sh 'kubectl apply -k monitoring'
           sh("""script/install_helm.sh""") 
           sh("""script/install_prometheus.sh""") 
       }
