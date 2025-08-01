@@ -4,7 +4,7 @@ metadata:
   name: kube-prometheus-stack-grafana
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:374965156099:certificate/e8aa39b3-9b4e-48ba-978b-88f9111f9b1e
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:374965156099:certificate/27ac49de-7607-4688-bedc-a7b17067821c
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-port: "3000" # Updated to match the service port
