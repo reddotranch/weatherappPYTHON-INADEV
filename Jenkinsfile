@@ -40,7 +40,7 @@ pipeline {
                       ${scannerHome}/bin/sonar-scanner  \
                       -Dsonar.projectKey=weather-app \
                       -Dsonar.projectName='weather-app' \
-                      -Dsonar.host.url=https://sonarqube1.betechsol.com \
+                      -Dsonar.host.url=https://sonarqube1.betechinc.com \
                       -Dsonar.token=${SONAR_TOKEN} \
                       -Dsonar.sources=.\
                      """
@@ -194,7 +194,7 @@ pipeline {
           
           if (params.Deployment_Type == 'apply') {
             emailBody = '''Build is Over. Check the application using the URL below:
-        https://weatherapp.betechsol.com/
+        https://weatherapp.betechinc.com/
         Let me know if the changes look okay.
         Thanks,
         TDW System Technologies,
