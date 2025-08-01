@@ -59,7 +59,7 @@ templates:
 #6. Put content below in a file alertmanager.yaml 
 cat <<EOF > alertmanager.yaml
 global:
-  slack_api_url: 'https://hooks.slack.com/services/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'
+  slack_api_url: 'https://hooks.slack.com/services/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'
 route:
   group_by: ['alertname']
   group_wait: 5s
